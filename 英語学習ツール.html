@@ -10,39 +10,148 @@
             margin: 20px;
             background-color: #f4f7f6;
             color: #333;
-            padding-bottom: 100px; /* 下部のリスト用に余白 */
+            padding-bottom: 100px;
         }
 
-        
         /* --- 上部統計エリア --- */
         .stats-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            padding: 25px 30px; /* パディングを増やしてゆとりを持たせる */
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
         }
         .stat-item { text-align: center; flex: 1; }
-        .stat-value { font-size: 1.5rem; font-weight: bold; display: block; color: #2c3e50; }
-        .stat-label { font-size: 0.8rem; color: #7f8c8d; text-transform: uppercase; }
+        
+        /* 数値の文字を大きく見やすく */
+        .stat-value { 
+            font-size: 2.2rem; 
+            font-weight: 800; 
+            display: block; 
+            color: #2c3e50; 
+            margin-top: 5px;
+            font-variant-numeric: tabular-nums; /* 数字の幅を揃える */
+        }
+        
+        /* ラベルのデザイン調整 */
+        .stat-label { 
+            font-size: 1rem; 
+            color: #7f8c8d; 
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        /* WPMの小さい文字用 */
+        .stat-sub-label {
+            font-size: 0.7rem;
+            font-weight: normal;
+            color: #95a5a6;
+            margin-top: 2px;
+        }
 
         /* --- コントロールボタン --- */
+        .controls {
+            margin-top: 10px;
+        }
         .controls button {
-            padding: 10px 15px;
+            padding: 10px 20px;
             margin: 0 5px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            transition: background 0.3s;
+            font-size: 0.9rem;
+            transition: all 0.2s ease; /* アニメーション */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        /* ホバー時の視覚効果 */
+        .controls button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            filter: brightness(1.1);
+        }
+        .controls button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
         .btn-start { background-color: #2ecc71; color: white; }
         .btn-pause { background-color: #f1c40f; color: white; }
         .btn-reset { background-color: #e74c3c; color: white; }
-        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; box-shadow: none; }
+
+        /* --- モード切替スイッチ周辺 --- */
+        .mode-control-container {
+            display: flex;
+            justify-content: flex-start; /* 左寄せ */
+            align-items: center;
+            margin-bottom: 15px; /* テキストエリアとの重なり防止 */
+            padding-left: 5px;
+        }
+
+        /* スイッチのスタイル */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin: 0 15px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* OFF (編集モード) の色 */
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        /* ON (マーカーモード) の色 */
+        input:checked + .slider {
+            background-color: #3498db;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        /* スイッチへのホバー効果 */
+        .slider:hover {
+            box-shadow: 0 0 8px rgba(0,0,0,0.2);
+        }
+
+        .mode-label {
+            font-weight: bold;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        /* アクティブなモードの文字色を濃くする */
+        .mode-active {
+            color: #2c3e50;
+            font-size: 1.0rem;
+        }
 
         /* --- テキストエリア周辺 --- */
         .input-container {
@@ -51,94 +160,82 @@
             height: 50vh;
         }
 
-        /* 編集ボタン (初期は非表示) */
-        #editBtn {
-            position: absolute;
-            top: -40px; /* コンテナの少し上に配置 */
-            left: 0;
-            background-color: #3498db;
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            display: none; /* JSで制御 */
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        #editBtn:hover { background-color: #2980b9; }
-
-        /* 共通スタイル（テキストエリアと閲覧エリアの見た目を合わせる） */
+        /* 共通スタイル */
         .text-style {
             width: 100%;
             height: 100%;
-            padding: 15px;
+            padding: 20px;
             border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 1.2rem; /* 読みやすいように少し大きく */
-            line-height: 1.6;
+            border-radius: 12px;
+            font-size: 1.3rem; /* さらに読みやすく */
+            line-height: 1.8;
             box-sizing: border-box;
             font-family: inherit;
             overflow-y: auto;
+            background-color: #fff;
+            transition: border-color 0.3s;
         }
 
         /* 入力用テキストエリア */
         textarea.text-style {
             resize: none;
             outline: none;
+            color: #555;
         }
-        textarea.text-style:focus { border-color: #3498db; }
+        textarea.text-style:focus { border-color: #3498db; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
 
         /* 閲覧用エリア (初期は非表示) */
         #readArea {
             display: none;
-            background-color: white;
-            white-space: pre-wrap; /* 改行やスペースを維持 */
+            background-color: #fafafa; /* マーカーモード時は背景を少し変えて区別 */
+            white-space: pre-wrap;
             cursor: default;
+            border-color: #3498db; /* マーカーモード時は枠線を青に */
         }
 
         /* --- 単語マーキング用スタイル --- */
         .interactive-word {
             cursor: pointer;
-            transition: opacity 0.2s, color 0.2s;
-            border-radius: 3px;
+            transition: all 0.2s;
+            border-radius: 4px;
+            padding: 0 2px;
         }
-        /* マウスオーバー時の視覚効果 */
         .interactive-word:hover {
-            opacity: 0.5;
-            background-color: rgba(0,0,0,0.05);
+            background-color: rgba(52, 152, 219, 0.15);
+            color: #2980b9;
         }
-        /* クリックされた時のスタイル (赤文字) */
         .marked {
-            color: #e74c3c;
+            color: #c0392b;
             font-weight: bold;
             background-color: #fadbd8;
+            border-bottom: 2px solid #e74c3c; /* 下線を追加して強調 */
         }
 
         /* --- 下部単語リストエリア --- */
         .vocab-section {
-            margin-top: 20px;
-            padding: 20px;
+            margin-top: 30px;
+            padding: 25px;
             background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            border-top: 4px solid #3498db;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid #3498db;
         }
         .vocab-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
-        .vocab-title { font-weight: bold; font-size: 1.1rem; }
+        .vocab-title { font-weight: bold; font-size: 1.2rem; color: #2c3e50; }
         .btn-clear {
             background-color: #95a5a6;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
+            padding: 8px 15px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 0.9rem;
+            transition: background 0.3s;
         }
         .btn-clear:hover { background-color: #7f8c8d; }
 
@@ -150,9 +247,10 @@
         .vocab-tag {
             background-color: #e74c3c;
             color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             animation: fadeIn 0.3s ease;
         }
 
@@ -171,7 +269,10 @@
         </div>
         
         <div class="stat-item">
-            <span class="stat-label">WPM</span>
+            <span class="stat-label">
+                WPM
+                <span class="stat-sub-label">(Words per minute)</span>
+            </span>
             <span id="wpmDisplay" class="stat-value">0.0</span>
         </div>
 
@@ -186,11 +287,17 @@
         </div>
     </div>
 
-    <div class="input-container">
-        <button id="editBtn">✎ Edit Text</button>
+    <div class="mode-control-container">
+        <span id="labelEdit" class="mode-label mode-active">Edit Mode</span>
+        <label class="switch">
+            <input type="checkbox" id="modeToggle">
+            <span class="slider round"></span>
+        </label>
+        <span id="labelMarker" class="mode-label">Marker Mode</span>
+    </div>
 
+    <div class="input-container">
         <textarea id="textInput" class="text-style" placeholder="ここに英文を入力またはペーストしてください..."></textarea>
-        
         <div id="readArea" class="text-style"></div>
     </div>
 
@@ -207,12 +314,13 @@
         let timer = null;
         let seconds = 0;
         let wordCount = 0;
-        let isEditButtonVisible = false; // 編集ボタンが一度表示されたか
 
         // DOM要素
         const textInput = document.getElementById('textInput');
         const readArea = document.getElementById('readArea');
-        const editBtn = document.getElementById('editBtn');
+        const modeToggle = document.getElementById('modeToggle'); // スイッチ
+        const labelEdit = document.getElementById('labelEdit');
+        const labelMarker = document.getElementById('labelMarker');
         
         const wordCountDisplay = document.getElementById('wordCount');
         const wpmDisplay = document.getElementById('wpmDisplay');
@@ -225,7 +333,7 @@
         const vocabList = document.getElementById('vocabList');
         const clearVocabBtn = document.getElementById('clearVocabBtn');
 
-        // 単語抽出用正規表現（アポストロフィ対応）
+        // 単語抽出用正規表現
         const wordRegex = /[a-zA-Z0-9]+(?:['’][a-zA-Z0-9]+)*/g;
 
         // --- 基本機能: 単語数カウント ---
@@ -243,23 +351,30 @@
         textInput.addEventListener('input', updateWordCount);
 
         // --- モード切替ロジック ---
-        
-        // テキストエリアの内容をHTML化して閲覧モードへ
+
+        // スイッチの変更イベント
+        modeToggle.addEventListener('change', () => {
+            if (modeToggle.checked) {
+                switchToReadMode();
+            } else {
+                switchToEditMode();
+            }
+        });
+
+        // マーカーモードへ (ON)
         function switchToReadMode() {
             const text = textInput.value;
             
-            // HTMLエスケープ（XSS対策）しつつ、単語をspanで囲む
-            // 1. まず全体をエスケープ
+            // ラベルのスタイル更新
+            labelMarker.classList.add('mode-active');
+            labelEdit.classList.remove('mode-active');
+
+            // HTML生成
             const escapedText = text
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;");
 
-            // 2. 単語部分を検索して置換
-            // 注意: replaceは文字列に対して行うと最初の一つしか置換しないので、正規表現を使う
-            // また、既にマークされた単語リストに基づいて色をつける機能は今回は「リセット」前提とするが、
-            // 必要なら復元ロジックも追加可能。今回はシンプルに毎回生成。
-            
             const htmlContent = escapedText.replace(wordRegex, (match) => {
                 return `<span class="interactive-word" onclick="toggleWord(this)">${match}</span>`;
             });
@@ -270,8 +385,12 @@
             readArea.style.display = 'block';
         }
 
-        // 編集モードに戻る
+        // 編集モードへ (OFF)
         function switchToEditMode() {
+            // ラベルのスタイル更新
+            labelEdit.classList.add('mode-active');
+            labelMarker.classList.remove('mode-active');
+
             textInput.style.display = 'block';
             readArea.style.display = 'none';
         }
@@ -295,8 +414,12 @@
         // スタートボタン
         startBtn.addEventListener('click', () => {
             if (!timer) {
-                // 編集不可にして閲覧モードへ
-                switchToReadMode();
+                // 仕様: スタートしたら自動的にマーカーモードにする
+                // スイッチの状態をONに変更し、イベントを発火または直接関数を呼ぶ
+                if (!modeToggle.checked) {
+                    modeToggle.checked = true;
+                    switchToReadMode();
+                }
 
                 timer = setInterval(() => {
                     seconds++;
@@ -304,27 +427,12 @@
                 }, 1000);
                 startBtn.disabled = true;
                 pauseBtn.disabled = false;
-                
-                // スタート中は編集ボタンは隠す仕様か、押せる仕様か。
-                // 設問「ストップウォッチをスタートさせると英文の編集が不可能になり」
-                // → 編集ボタンを押せば編集可能になるが、それはストップウォッチを止める行為とみなすべき。
-                // 今回は「スタート中は編集ボタンを隠す（または押せない）」のが自然ですが、
-                // 「永続表示」という要望があるので表示はしたまま、押すとタイマー停止等の処理を挟む形にします。
             }
         });
 
         // 一時停止ボタン
         pauseBtn.addEventListener('click', () => {
             stopTimer();
-        });
-
-        // 編集ボタン（停止時のみ出現し、以降永続）
-        editBtn.addEventListener('click', () => {
-            // もしタイマー動作中なら止める
-            if (timer) {
-                stopTimer();
-            }
-            switchToEditMode();
         });
 
         // リセットボタン
@@ -334,9 +442,12 @@
             timerDisplay.innerText = "00:00";
             wpmDisplay.innerText = "0.0";
             
-            // リセット時は編集モードに戻す？ それとも今のモード維持？
-            // 一般的には最初に戻るので編集モードへ
-            switchToEditMode();
+            // リセット時、編集モードに戻すかどうかは任意ですが、
+            // 一般的なUXとして編集モード（初期状態）に戻します
+            if (modeToggle.checked) {
+                modeToggle.checked = false;
+                switchToEditMode();
+            }
         });
 
         function stopTimer() {
@@ -346,40 +457,25 @@
                 startBtn.disabled = false;
                 pauseBtn.disabled = true;
                 calculateWPM();
-
-                // 停止したら編集ボタンを表示（初回のみ処理）
-                if (!isEditButtonVisible) {
-                    editBtn.style.display = 'block';
-                    isEditButtonVisible = true;
-                }
             }
         }
 
         // --- 単語マーキング機能 ---
 
-        // グローバルスコープで関数定義（HTML内のonclickから呼ぶため）
         window.toggleWord = function(element) {
-            // クラスの切り替え
             element.classList.toggle('marked');
-            
-            // リストの更新
             updateVocabList();
         };
 
         function updateVocabList() {
-            // 現在マークされているすべての要素を取得
             const markedElements = document.querySelectorAll('.interactive-word.marked');
-            
-            // 単語のテキストを配列化し、重複を除去 (Setを使用)
             const wordsSet = new Set();
             markedElements.forEach(el => {
                 wordsSet.add(el.innerText);
             });
 
-            // リスト表示をリセット
             vocabList.innerHTML = '';
 
-            // リスト生成
             wordsSet.forEach(word => {
                 const tag = document.createElement('span');
                 tag.className = 'vocab-tag';
@@ -388,13 +484,9 @@
             });
         }
 
-        // リストクリアボタン
         clearVocabBtn.addEventListener('click', () => {
-            // 表示エリアのマークを外す
             const markedElements = document.querySelectorAll('.interactive-word.marked');
             markedElements.forEach(el => el.classList.remove('marked'));
-            
-            // 下部のリストを空にする
             vocabList.innerHTML = '';
         });
 
